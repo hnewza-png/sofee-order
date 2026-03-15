@@ -179,7 +179,7 @@ function renderStep2(card) {
       <button class="back-btn" onclick="goBack(1)">←</button>
       <span class="card-title" style="margin:0">เลือกผลไม้ ${state.selectedFruits.length}/${size.fruitCount} 🍓</span>
     </div>
-    <p style="font-size:12px;color:#c48b9f;margin-bottom:16px">ไซส์ ${state.selectedSize} · เลือกได้ ${size.fruitCount} อย่าง</p>
+    <p style="font-size:12px;color:#c48b9f;margin-bottom:16px">ไซส์ ${state.selectedSize} · เลือกได้ 1–${size.fruitCount} อย่าง</p>
     <div class="fruit-grid">
       ${fruits.map(f => {
         const sel = state.selectedFruits.includes(f.id);
@@ -188,8 +188,8 @@ function renderStep2(card) {
           <div class="fruit-emoji">${f.emoji}</div><div class="fruit-name">${f.label}</div></button>`;
       }).join("")}
     </div>
-    <button class="btn-primary" ${remaining > 0 ? "disabled" : ""} onclick="goStep(3)">
-      ${remaining > 0 ? `เลือกอีก ${remaining} อย่าง` : "ถัดไป →"}
+    <button class="btn-primary" ${state.selectedFruits.length === 0 ? "disabled" : ""} onclick="goStep(3)">
+      ${state.selectedFruits.length === 0 ? "เลือกผลไม้อย่างน้อย 1 อย่าง" : `ถัดไป → (เลือกแล้ว ${state.selectedFruits.length}/${size.fruitCount})`}
     </button>`;
 }
 
