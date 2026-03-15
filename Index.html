@@ -213,8 +213,8 @@ function renderStep3(card) {
       <div>🍓 ผลไม้: ${fruitNames}</div>
       <div>🎁 แถมฟรี: ${size.extras.join(", ")}</div>
     </div>
-    <label>ชื่อ (ไม่บังคับ)</label>
-    <input type="text" id="nameInput" placeholder="พิมพ์ชื่อของคุณ..." value="${state.name}" oninput="state.name=this.value">
+    <label>ชื่อ <span style="color:#e91e63">*</span></label>
+    <input type="text" id="nameInput" placeholder="พิมพ์ชื่อของคุณ..." value="${state.name}" oninput="state.name=this.value.trim()">
     <label>โน๊ต / ความต้องการพิเศษ (ไม่บังคับ)</label>
     <textarea id="noteInput" rows="3" placeholder="เช่น ไม่ใส่น้ำผึ้ง, หวานน้อย..." oninput="state.note=this.value">${state.note}</textarea>
     <label>จำนวน</label>
@@ -224,12 +224,20 @@ function renderStep3(card) {
       <button class="qty-btn" onclick="changeQty(1)">+</button>
       <span class="qty-total">รวม <b>${size.price * state.qty} ฿</b></span>
     </div>
-    <button class="btn-primary" id="confirmBtn" onclick="confirmOrder()">✅ สร้าง Order ของฉัน</button>`;
+    <button class="btn-primary" id="confirmBtn" onclick="confirmOrder()">✅ สร้าง Order ของฉัน</button>
+    <div id="nameError" style="color:#e91e63;font-size:12px;margin-top:8px;display:none;">⚠️ กรุณาใส่ชื่อก่อนนะคะ</div>`;
 }
 
 function changeQty(delta) { state.qty = Math.max(1, state.qty + delta); render(); }
 
 async function confirmOrder() {
+  if (!state.name || state.name.trim() === "") {
+    const err = document.getElementById("nameError");
+    const input = document.getElementById("nameInput");
+    if (err) err.style.display = "block";
+    if (input) { input.style.borderColor = "#e91e63"; input.focus(); }
+    return;
+  }
   const size = sizes.find(s => s.id === state.selectedSize);
   const fruitNames = state.selectedFruits.map(id => { const f = fruits.find(f => f.id === id); return f.emoji + f.label; }).join(", ");
   state.orderText =
