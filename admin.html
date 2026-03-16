@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Greek Yogurt by Sofee</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: #1a0a0e; font-family: 'Sarabun', sans-serif; color: #f8e8ec; }
+
+  /* ---- LOGIN PAGE ---- */
+  .login-page {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1a0a0e 0%, #2d1020 50%, #1a0a1e 100%);
+    padding: 24px;
+  }
+  .login-card {
+    width: 100%; max-width: 360px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 36px 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: fadeUp 0.5s ease;
+  }
+  .login-logo { text-align: center; margin-bottom: 24px; }
+  .login-logo .emoji { font-size: 52px; }
+  .login-logo h1 { font-size: 20px; font-weight: 700; color: #fff; margin-top: 10px; }
+  .login-logo p { font-size: 12px; color: #9e6070; margin-top: 4px; }
+
+  .login-label { font-size: 13px; color: #f8bbd0; font-weight: 600; display: block; margin-bottom: 6px; }
+  .login-input {
+    width: 100%; padding: 12px 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 12px; color: #fff;
+    font-size: 14px; font-family: 'Sarabun', sans-serif;
+    outline: none; margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { border-color: #f06292; }
+  .login-input::placeholder { color: #6d4050; }
+
+  .login-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #f06292, #c2185b);
+    color: #fff; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    transition: all 0.2s; margin-top: 4px;
+  }
+  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(233,30,99,0.4); }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .login-error {
+    background: rgba(233,30,99,0.15);
+    border: 1px solid rgba(233,30,99,0.3);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; color: #f48fb1;
+    margin-top: 14px; display: none;
+    text-align: center;
+  }
+
+  /* ---- ADMIN PAGE ---- */
+  .admin-page { display: none; padding-bottom: 60px; }
+
+  .topbar { background: linear-gradient(135deg, #6d3b47, #a0293f); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 16px rgba(0,0,0,0.4); }
+  .topbar-left h1 { font-size: 16px; font-weight: 700; color: #fff; }
+  .topbar-left p { font-size: 11px; color: #f8bbd0; margin-top: 2px; }
+  .topbar-right { display: flex; gap: 8px; align-items: center; }
+
+  .icon-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15); color: #f8bbd0; border-radius: 20px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: 'Sarabun', sans-serif; transition: all 0.2s; }
+  .icon-btn:hover { background: rgba(255,255,255,0.2); }
+  .icon-btn.logout { color: #f48fb1; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 16px; }
+  .stat-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 10px; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 700; color: #f06292; }
+  .stat-label { font-size: 11px; color: #c48b9f; margin-top: 2px; }
+
+  .filter-row { display: flex; gap: 8px; padding: 4px 16px 12px; overflow-x: auto; }
+  .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; color: #f8bbd0; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'Sarabun', sans-serif; transition: all 0.2s; }
+  .filter-btn.active { background: #e91e63; border-color: #e91e63; color: #fff; }
+
+  .section-title { font-size: 13px; font-weight: 700; color: #f8bbd0; padding: 4px 16px 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .order-list { padding: 0 12px; display: flex; flex-direction: column; gap: 10px; }
+  .order-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px 16px; transition: all 0.2s; animation: fadeUp 0.3s ease both; }
+  .order-card.done { opacity: 0.45; }
+  .order-card.done .order-name { text-decoration: line-through; }
+  .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .order-name { font-size: 16px; font-weight: 700; color: #fff; }
+  .order-details { font-size: 13px; color: #e8c4cc; line-height: 1.7; margin-bottom: 10px; }
+  .order-note { font-size: 12px; color: #f48fb1; background: rgba(244,143,177,0.1); border-radius: 8px; padding: 6px 10px; margin-bottom: 10px; }
+  .order-footer { display: flex; justify-content: space-between; align-items: center; }
+  .order-price { font-size: 16px; font-weight: 700; color: #f06292; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-new { background: rgba(233,30,99,0.2); color: #f06292; border: 1px solid rgba(233,30,99,0.3); }
+  .badge-done { background: rgba(102,187,106,0.15); color: #66bb6a; border: 1px solid rgba(102,187,106,0.3); }
+  .done-btn { padding: 6px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Sarabun', sans-serif; transition: all 0.2s; }
+  .done-btn.mark { background: #e91e63; color: #fff; }
+  .done-btn.unmark { background: rgba(255,255,255,0.1); color: #c48b9f; }
+  .delete-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; opacity: 0.5; transition: opacity 0.2s; }
+  .delete-btn:hover { opacity: 1; }
+  .empty { text-align: center; padding: 48px 20px; color: #6d3b47; font-size: 14px; }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .loading { text-align: center; padding: 48px; color: #9e6070; font-size: 14px; }
+  .size-badge { display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#f06292,#e91e63); color: #fff; font-size: 13px; font-weight: 700; text-align: center; line-height: 28px; margin-right: 6px; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="emoji">🥛</div>
+      <h1>Sofee Admin</h1>
+      <p>เข้าสู่ระบบเพื่อดู Order</p>
+    </div>
+    <label class="login-label">Email</label>
+    <input class="login-input" type="email" id="emailInput" placeholder="กรอก email ของคุณ">
+    <label class="login-label">Password</label>
+    <input class="login-input" type="password" id="passwordInput" placeholder="กรอก password" onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">🔐 เข้าสู่ระบบ</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="admin-page" id="adminPage">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>🥛 Admin — Sofee Order</h1>
+      <p id="lastUpdate">กำลังโหลด...</p>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="refreshBtn">🔄</button>
+      <button class="icon-btn logout" id="logoutBtn">ออกจากระบบ</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Order ทั้งหมด</div></div>
+    <div class="stat-card"><div class="stat-num" id="statNew" style="color:#f06292">—</div><div class="stat-label">รอทำ</div></div>
+    <div class="stat-card"><div class="stat-num" id="statIncome" style="color:#66bb6a;font-size:18px">—</div><div class="stat-label">ยอดรวม ฿</div></div>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" id="filterAll">ทั้งหมด</button>
+    <button class="filter-btn" id="filterNew">🔴 รอทำ</button>
+    <button class="filter-btn" id="filterDone">✅ เสร็จแล้ว</button>
+  </div>
+
+  <div class="section-title">รายการ ORDER</div>
+  <div class="order-list" id="orderList">
+    <div class="loading">⏳ กำลังโหลด...</div>
+  </div>
+</div>
+
+<script>
+function loadScript(src, cb) {
+  var s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function initFirebase() {
+  loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js', function() {
+    loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js', function() {
+      loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js', function() {
+        startApp();
+      });
+    });
+  });
+}
+
+window.onload = initFirebase;
+
+function startApp() {
+const firebaseConfig = {
+  apiKey: "AIzaSyBsvIHJud05sw3pDyoLyZHreZTuE",
+  authDomain: "sofee-order-be272.firebaseapp.com",
+  databaseURL: "https://sofee-order-be272-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sofee-order-be272",
+  storageBucket: "sofee-order-be272.firebasestorage.app",
+  messagingSenderId: "764695346353",
+  appId: "1:764695346353:web:18831670c0c1f4e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let allOrders = [];
+let currentFilter = "all";
+
+// ---- AUTH STATE ----
+auth.onAuthStateChanged(function(user) {
+  if (user) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("adminPage").style.display = "block";
+    loadOrders();
+  } else {
+    document.getElementById("loginPage").style.display = "flex";
+    document.getElementById("adminPage").style.display = "none";
+  }
+});
+
+// ---- LOGIN ----
+function doLogin() {
+  const email = document.getElementById("emailInput").value.trim();
+  const password = document.getElementById("passwordInput").value;
+  const btn = document.getElementById("loginBtn");
+  const errEl = document.getElementById("loginError");
+
+  if (!email || !password) {
+    errEl.textContent = "⚠️ กรุณากรอก email และ password";
+    errEl.style.display = "block";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "⏳ กำลังเข้าสู่ระบบ...";
+  errEl.style.display = "none";
+
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(function(error) {
+      btn.disabled = false;
+      btn.textContent = "🔐 เข้าสู่ระบบ";
+      errEl.textContent = "❌ Email หรือ Password ไม่ถูกต้อง";
+      errEl.style.display = "block";
+    });
+}
+
+// ---- LOGOUT ----
+document.getElementById("logoutBtn").onclick = function() {
+  if (confirm("ออกจากระบบ?")) auth.signOut();
+};
+
+// ---- ORDERS ----
+function renderOrders() {
+  const list = document.getElementById("orderList");
+  const filtered = currentFilter === "all" ? allOrders
+    : currentFilter === "done" ? allOrders.filter(o => o.status === "done")
+    : allOrders.filter(o => o.status !== "done");
+
+  document.getElementById("statTotal").textContent = allOrders.length;
+  document.getElementById("statNew").textContent = allOrders.filter(o => o.status !== "done").length;
+  document.getElementById("statIncome").textContent = allOrders.reduce((s, o) => s + (o.price || 0), 0).toLocaleString();
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>ไม่มี Order ในหมวดนี้</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(o => `
+    <div class="order-card${o.status === "done" ? " done" : ""}">
+      <div class="order-top">
+        <div>
+          <span class="order-name">👤 ${o.name}</span>
+          <span class="badge ${o.status === "done" ? "badge-done" : "badge-new"}" style="margin-left:8px">
+            ${o.status === "done" ? "✅ เสร็จแล้ว" : "🔴 รอทำ"}
+          </span>
+        </div>
+        <button class="delete-btn" onclick="deleteOrder('${o.key}')">🗑️</button>
+      </div>
+      <div class="order-details">
+        <span class="size-badge">${o.size}</span>${o.size === "L" ? "2 สกู๊ป" : "1 สกู๊ป"} x${o.qty}<br>
+        🍓 ${o.fruits}<br>
+        🎁 ${o.extras}
+      </div>
+      ${o.note ? `<div class="order-note">📝 ${o.note}</div>` : ""}
+      <div class="order-footer">
+        <div>
+          <div class="order-price">${(o.price || 0).toLocaleString()} ฿</div>
+          <div style="font-size:11px;color:#9e6070;margin-top:2px">${o.timeStr || ""}</div>
+        </div>
+        <button class="done-btn ${o.status === "done" ? "unmark" : "mark"}" onclick="toggleDone('${o.key}', '${o.status}')">
+          ${o.status === "done" ? "↩️ ยังไม่เสร็จ" : "✅ ทำเสร็จแล้ว"}
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function toggleDone(key, currentStatus) {
+  db.ref("orders/" + key).update({ status: currentStatus === "done" ? "new" : "done" });
+}
+
+function deleteOrder(key) {
+  if (confirm("ลบ order นี้?")) db.ref("orders/" + key).remove();
+}
+
+function loadOrders() {
+  document.getElementById("lastUpdate").textContent = "กำลังโหลด...";
+  db.ref("orders").on("value", function(snapshot) {
+    allOrders = [];
+    snapshot.forEach(function(child) {
+      allOrders.push(Object.assign({ key: child.key }, child.val()));
+    });
+    allOrders.reverse();
+    renderOrders();
+    document.getElementById("lastUpdate").textContent = "อัปเดตล่าสุด " + new Date().toLocaleTimeString("th-TH");
+  });
+}
+
+document.getElementById("filterAll").onclick = function() { setFilter("all", "filterAll"); };
+document.getElementById("filterNew").onclick = function() { setFilter("new", "filterNew"); };
+document.getElementById("filterDone").onclick = function() { setFilter("done", "filterDone"); };
+document.getElementById("refreshBtn").onclick = loadOrders;
+
+function setFilter(f, id) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.getElementById(id).classList.add("active");
+  renderOrders();
+}
+
+} // end startApp
+</script>
+</body>
+</html>
