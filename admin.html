@@ -210,9 +210,10 @@ function permanentDelete(key) {
   }
 }
 
-function confirmPayment(key) {
+function confirmPayment(key, currentStatus) {
   if (!_db) return;
-  _db.ref("orders/" + key).update({ paymentStatus: "confirmed" });
+  var newStatus = currentStatus === 'confirmed' ? 'pending' : 'confirmed';
+  _db.ref("orders/" + key).update({ paymentStatus: newStatus });
 }
 
 function loadScript(src, cb) {
@@ -334,10 +335,10 @@ function startApp() {
           o.paymentLabel + '</span>'
         : '';
 
-      var paymentConfirmBtn = (o.payment === 'transfer' && o.paymentStatus !== 'confirmed')
-        ? '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\')" style="background:rgba(66,165,245,0.2);color:#42a5f5;border:1px solid rgba(66,165,245,0.3);margin-bottom:6px;width:100%;">💰 ยืนยันรับเงินแล้ว</button>'
-        : (o.payment === 'transfer' && o.paymentStatus === 'confirmed')
-        ? '<div style="font-size:11px;color:#66bb6a;margin-bottom:6px;">✅ ยืนยันรับเงินแล้ว</div>'
+      var paymentConfirmBtn = (o.payment === 'transfer')
+        ? (o.paymentStatus === 'confirmed'
+          ? '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'confirmed\')" style="background:rgba(102,187,106,0.2);color:#66bb6a;border:1px solid rgba(102,187,106,0.3);margin-bottom:6px;width:100%;">✅ รับเงินแล้ว — กดเพื่อยกเลิก</button>'
+          : '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'pending\')" style="background:rgba(66,165,245,0.2);color:#42a5f5;border:1px solid rgba(66,165,245,0.3);margin-bottom:6px;width:100%;">💰 ยืนยันรับเงินแล้ว</button>')
         : '';
 
       return '<div class="order-card' + (isDone ? " done" : "") + (isDeleted ? '" style="opacity:0.5' : "") + '">' +
