@@ -210,6 +210,11 @@ function permanentDelete(key) {
   }
 }
 
+function confirmPayment(key) {
+  if (!_db) return;
+  _db.ref("orders/" + key).update({ paymentStatus: "confirmed" });
+}
+
 function loadScript(src, cb) {
   var s = document.createElement('script');
   s.src = src; s.onload = cb;
@@ -323,17 +328,30 @@ function startApp() {
         ? '<span class="badge" style="background:rgba(158,96,112,0.2);color:#9e6070;border:1px solid rgba(158,96,112,0.3);">🗑️ ลบแล้ว</span>'
         : '<span class="badge ' + (isDone ? "badge-done" : "badge-new") + '">' + (isDone ? "✅ เสร็จแล้ว" : "🔴 รอทำ") + '</span>';
 
+      var paymentBadge = o.paymentLabel
+        ? '<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:4px;' +
+          (o.payment === 'cash' ? 'background:rgba(255,193,7,0.15);color:#ffc107;border:1px solid rgba(255,193,7,0.3);">' : 'background:rgba(66,165,245,0.15);color:#42a5f5;border:1px solid rgba(66,165,245,0.3);">') +
+          o.paymentLabel + '</span>'
+        : '';
+
+      var paymentConfirmBtn = (o.payment === 'transfer' && o.paymentStatus !== 'confirmed')
+        ? '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\')" style="background:rgba(66,165,245,0.2);color:#42a5f5;border:1px solid rgba(66,165,245,0.3);margin-bottom:6px;width:100%;">💰 ยืนยันรับเงินแล้ว</button>'
+        : (o.payment === 'transfer' && o.paymentStatus === 'confirmed')
+        ? '<div style="font-size:11px;color:#66bb6a;margin-bottom:6px;">✅ ยืนยันรับเงินแล้ว</div>'
+        : '';
+
       return '<div class="order-card' + (isDone ? " done" : "") + (isDeleted ? '" style="opacity:0.5' : "") + '">' +
         '<div class="order-top"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
         (o.orderNo ? '<span style="background:linear-gradient(135deg,#f06292,#c2185b);color:#fff;font-size:13px;font-weight:700;padding:2px 10px;border-radius:20px;">#' + o.orderNo + '</span>' : '') +
         '<span class="order-name">👤 ' + o.name + '</span>' +
-        statusBadge + '</div>' +
+        statusBadge + paymentBadge + '</div>' +
         (!isDeleted ? '<button class="delete-btn" onclick="deleteOrder(\'' + o.key + '\')">🗑️</button>' : '') +
         '</div>' +
         '<div class="order-details">' +
         '<span class="size-badge">' + o.size + '</span>' + (o.size === "L" ? "2 สกู๊ป" : "1 สกู๊ป") + ' x' + o.qty + '<br>' +
         '🍓 ' + o.fruits + '<br>🎁 ' + o.extras + '</div>' +
         (o.note ? '<div class="order-note">📝 ' + o.note + '</div>' : '') +
+        '<div style="margin-bottom:6px;">' + paymentConfirmBtn + '</div>' +
         '<div class="order-footer"><div>' +
         '<div class="order-price">' + (o.price||0).toLocaleString() + ' ฿</div>' +
         '<div style="font-size:11px;color:#9e6070;margin-top:2px">' + (o.timeStr||"") + '</div></div>' +
