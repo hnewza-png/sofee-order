@@ -23,6 +23,7 @@
   .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: #f8bbd0; color: #c48b9f; transition: all 0.3s; }
   .step-dot.active { background: #f06292; color: #fff; transform: scale(1.1); }
   .step-dot.done { background: #e91e63; color: #fff; }
+  .step-dot.complete { background: linear-gradient(135deg, #66bb6a, #388e3c); color: #fff; transform: scale(1.2); animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); font-size: 14px; }
   .step-line { width: 16px; height: 2px; background: #f8bbd0; border-radius: 2px; transition: all 0.3s; }
   .step-line.done { background: #e91e63; }
   .card { background: rgba(255,255,255,0.92); border-radius: 20px; padding: 24px; box-shadow: 0 8px 32px rgba(173,80,110,0.13); animation: fadeUp 0.4s ease; }
@@ -69,6 +70,7 @@
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes bounce { 0%,100% { transform: scale(1); } 40% { transform: scale(1.3); } 70% { transform: scale(0.9); } }
+  @keyframes popIn { 0% { transform: scale(0); opacity:0; } 60% { transform: scale(1.35); } 100% { transform: scale(1.2); opacity:1; } }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -136,8 +138,18 @@ function updateProgress() {
   for (let i = 1; i <= 4; i++) {
     const dot = document.getElementById("dot" + i);
     dot.className = "step-dot";
-    if (i < state.step) dot.classList.add("done");
-    else if (i === state.step) dot.classList.add("active");
+    if (i === 4 && state.step === 4) {
+      dot.className = "step-dot complete";
+      dot.textContent = "✓";
+    } else if (i < state.step) {
+      dot.classList.add("done");
+      dot.textContent = i;
+    } else if (i === state.step) {
+      dot.classList.add("active");
+      dot.textContent = i;
+    } else {
+      dot.textContent = i;
+    }
   }
   for (let i = 1; i <= 3; i++) {
     const line = document.getElementById("line" + i);
