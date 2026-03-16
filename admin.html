@@ -177,10 +177,10 @@ function doLogin() {
   btn.disabled = true;
   btn.textContent = "⏳ กำลังเข้าสู่ระบบ...";
   errEl.style.display = "none";
-  _auth.signInWithEmailAndPassword(email, password).catch(function() {
+  _auth.signInWithEmailAndPassword(email, password).catch(function(error) {
     btn.disabled = false;
     btn.textContent = "🔐 เข้าสู่ระบบ";
-    errEl.textContent = "❌ Email หรือ Password ไม่ถูกต้อง";
+    errEl.textContent = "❌ " + error.code + ": " + error.message;
     errEl.style.display = "block";
   });
 }
