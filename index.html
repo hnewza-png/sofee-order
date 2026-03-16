@@ -406,7 +406,7 @@ function renderStep4(card) {
     </div>
 
     <button onclick="saveAsImage(this)" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:'Sarabun',sans-serif;background:linear-gradient(135deg,#7c4dff,#512da8);color:#fff;">
-      📸 บันทึกเป็นรูป
+      📤 แชร์ / บันทึกรูป
     </button>
 
     <div style="display:flex;gap:10px;margin-bottom:10px">
@@ -429,62 +429,46 @@ function saveAsImage(btn) {
 
   function doCapture() {
     const receipt = document.getElementById("receiptCard");
-    html2canvas(receipt, { backgroundColor: "#ffffff", scale: 3, useCORS: true, logging: false }).then(function(canvas) {
-      const dataUrl = canvas.toDataURL("image/png");
+    html2canvas(receipt, { backgroundColor: "#ffffff", scale: 3, useCORS: true, logging: false }).then(async function(canvas) {
 
-      // Method 1: try download link (Chrome/Firefox)
-      try {
+      canvas.toBlob(async function(blob) {
+        // Method 1: Web Share API (Android + iOS — opens share sheet)
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], "sofee-order.png", { type: "image/png" })] })) {
+          try {
+            await navigator.share({
+              files: [new File([blob], "sofee-order-" + state.orderNo + ".png", { type: "image/png" })],
+              title: "Order #" + state.orderNo + " — Greek Yogurt by Sofee",
+            });
+            btn.textContent = "✅ แชร์แล้ว!";
+            btn.style.background = "linear-gradient(135deg,#66bb6a,#388e3c)";
+            btn.disabled = false;
+            return;
+          } catch(e) {
+            // User cancelled share — that's ok
+            btn.textContent = "📸 บันทึกเป็นรูป";
+            btn.style.background = "linear-gradient(135deg,#7c4dff,#512da8)";
+            btn.disabled = false;
+            return;
+          }
+        }
+
+        // Method 2: Direct download (Chrome desktop/Firefox)
+        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.download = "sofee-order-" + state.orderNo + ".png";
-        link.href = dataUrl;
+        link.href = url;
         link.click();
-        // Check if download worked by showing success after short delay
-        setTimeout(function() {
-          btn.textContent = "✅ บันทึกรูปแล้ว!";
-          btn.style.background = "linear-gradient(135deg,#66bb6a,#388e3c)";
-          btn.disabled = false;
-        }, 500);
-      } catch(e) {
-        // Method 2: open in new tab (Line browser, Safari, Edge)
-        openImageTab(dataUrl, btn);
-      }
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        btn.textContent = "✅ บันทึกรูปแล้ว!";
+        btn.style.background = "linear-gradient(135deg,#66bb6a,#388e3c)";
+        btn.disabled = false;
 
-      // If on iOS Safari or Line browser, also show in new tab
-      var ua = navigator.userAgent.toLowerCase();
-      var isLine = ua.indexOf('line') > -1;
-      var isSafari = ua.indexOf('safari') > -1 && ua.indexOf('chrome') === -1;
-      var isIOS = /iphone|ipad|ipod/.test(ua);
-      if (isLine || (isSafari && isIOS)) {
-        openImageTab(dataUrl, btn);
-      }
+      }, "image/png");
 
     }).catch(function() {
       btn.textContent = "⚠️ ลองอีกครั้ง";
       btn.disabled = false;
     });
-  }
-
-  function openImageTab(dataUrl, btn) {
-    // Open image in new tab with instruction overlay
-    var w = window.open("", "_blank");
-    if (w) {
-      w.document.write(`
-        <!DOCTYPE html><html><head>
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Order #${state.orderNo}</title>
-        <style>body{margin:0;background:#1a0a0e;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;}
-        .tip{background:rgba(240,98,146,0.15);border:1px solid #f06292;border-radius:12px;padding:12px 16px;margin:16px;color:#f06292;font-size:13px;text-align:center;max-width:300px;}
-        img{max-width:90vw;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
-        </style></head><body>
-        <div class="tip">📥 กดค้างที่รูป → "บันทึกภาพ" หรือ "Save Image"</div>
-        <img src="${dataUrl}" />
-        </body></html>
-      `);
-      w.document.close();
-    }
-    btn.textContent = "✅ เปิดรูปแล้ว!";
-    btn.style.background = "linear-gradient(135deg,#66bb6a,#388e3c)";
-    btn.disabled = false;
   }
 
   if (typeof html2canvas === "undefined") {
