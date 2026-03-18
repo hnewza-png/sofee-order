@@ -216,6 +216,19 @@ function confirmPayment(key, currentStatus) {
   _db.ref("orders/" + key).update({ paymentStatus: newStatus });
 }
 
+function saveAdminComment(key) {
+  if (!_db) return;
+  var ta = document.getElementById("ac_" + key);
+  var saved = document.getElementById("ac_saved_" + key);
+  if (!ta) return;
+  _db.ref("orders/" + key).update({ adminComment: ta.value }, function() {
+    if (saved) {
+      saved.style.display = "inline";
+      setTimeout(function() { saved.style.display = "none"; }, 2000);
+    }
+  });
+}
+
 function loadScript(src, cb) {
   var s = document.createElement('script');
   s.src = src; s.onload = cb;
@@ -355,7 +368,17 @@ function startApp() {
         '<div class="order-details">' +
         '<span class="size-badge">' + o.size + '</span>' + (o.size === "L" ? "2 สกู๊ป" : "1 สกู๊ป") + ' x' + o.qty + '<br>' +
         '🍓 ' + o.fruits + '<br>🎁 ' + o.extras + '</div>' +
-        (o.note ? '<div class="order-note">📝 ' + o.note + '</div>' : '') +
+        (o.note ? '<div class="order-note">📝 โน๊ตลูกค้า: ' + o.note + '</div>' : '') +
+        // Admin comment box
+        '<div style="margin:8px 0;padding:10px;background:rgba(255,193,7,0.07);border:1px solid rgba(255,193,7,0.25);border-radius:10px;">' +
+        '<div style="font-size:11px;font-weight:700;color:#ffc107;margin-bottom:6px;">🗒️ โน๊ตแม่ค้า</div>' +
+        '<textarea id="ac_' + o.key + '" rows="2" placeholder="พิมพ์โน๊ตของแม่ค้าที่นี่..." ' +
+        'style="width:100%;background:rgba(255,193,7,0.05);border:1px solid rgba(255,193,7,0.2);border-radius:8px;padding:7px;font-size:12px;color:#fff;resize:none;font-family:\'Sarabun\',sans-serif;box-sizing:border-box;">' +
+        (o.adminComment || '') +
+        '</textarea>' +
+        '<button onclick="saveAdminComment(\'' + o.key + '\')" style="margin-top:6px;padding:5px 14px;border:none;border-radius:8px;background:rgba(255,193,7,0.2);color:#ffc107;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Sarabun\',sans-serif;">💾 บันทึก</button>' +
+        '<span id="ac_saved_' + o.key + '" style="font-size:11px;color:#66bb6a;margin-left:8px;display:none;">✅ บันทึกแล้ว</span>' +
+        '</div>' +
         '<div style="margin-bottom:6px;">' + paymentConfirmBtn + '</div>' +
         '<div class="order-footer"><div>' +
         '<div class="order-price">' + (o.price||0).toLocaleString() + ' ฿</div>' +
