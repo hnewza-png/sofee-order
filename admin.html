@@ -337,8 +337,12 @@ function startApp() {
 
       var paymentConfirmBtn = (o.payment === 'transfer')
         ? (o.paymentStatus === 'confirmed'
-          ? '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'confirmed\')" style="background:rgba(102,187,106,0.2);color:#66bb6a;border:1px solid rgba(102,187,106,0.3);margin-bottom:6px;width:100%;">✅ รับเงินแล้ว — กดเพื่อยกเลิก</button>'
-          : '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'pending\')" style="background:rgba(66,165,245,0.2);color:#42a5f5;border:1px solid rgba(66,165,245,0.3);margin-bottom:6px;width:100%;">💰 ยืนยันรับเงินแล้ว</button>')
+          ? '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'confirmed\')" style="background:rgba(102,187,106,0.2);color:#66bb6a;border:1px solid rgba(102,187,106,0.3);margin-bottom:6px;width:100%;">✅ รับโอนแล้ว — กดเพื่อยกเลิก</button>'
+          : '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'pending\')" style="background:rgba(66,165,245,0.2);color:#42a5f5;border:1px solid rgba(66,165,245,0.3);margin-bottom:6px;width:100%;">💰 ยืนยันรับโอนแล้ว</button>')
+        : (o.payment === 'cash')
+        ? (o.paymentStatus === 'confirmed'
+          ? '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'confirmed\')" style="background:rgba(102,187,106,0.2);color:#66bb6a;border:1px solid rgba(102,187,106,0.3);margin-bottom:6px;width:100%;">✅ รับเงินสดแล้ว — กดเพื่อยกเลิก</button>'
+          : '<button class="done-btn" onclick="confirmPayment(\'' + o.key + '\',\'pending\')" style="background:rgba(255,193,7,0.2);color:#ffc107;border:1px solid rgba(255,193,7,0.3);margin-bottom:6px;width:100%;">💵 ยืนยันรับเงินสดแล้ว</button>')
         : '';
 
       return '<div class="order-card' + (isDone ? " done" : "") + (isDeleted ? '" style="opacity:0.5' : "") + '">' +
